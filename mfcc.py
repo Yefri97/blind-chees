@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_coeficients(a):
+def get_coeficients(r, a):
     """
     Get the Mel Frecuency Cepstral Coeficients from the input audio.
 
@@ -21,5 +21,16 @@ def get_coeficients(a):
     stp = 0
     while stp + fsr - 1 < a.shape[0]:                           # For each frame
         s = a[stp : stp + fsr]                                           # Frame
-        print(s)
-        stp += fstpr
+
+        """ Fourier Transform """
+        S = fft(s)                                      # Fast Fourier Transform
+        P = S ** 2 / s.shape[0]                                 # Power spectral
+        """ Apply the mel filterbank """
+        mfb = mel_filterbank()
+        c = np.dot(mfb.T, P)
+        """ Take the log """
+        c = np.log(c)
+        """ Discrete Cosine Transform """
+        c = dct(c)
+
+        stp += fstpr                                                # Next Frame
