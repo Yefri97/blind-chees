@@ -1,6 +1,6 @@
 import numpy as np
 
-def get_coeficients(r, a):
+def coeficients(r, a):
     """
     Get the Mel Frecuency Cepstral Coeficients from the input audio.
 
