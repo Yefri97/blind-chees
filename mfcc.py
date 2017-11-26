@@ -1,3 +1,7 @@
+# --------------------------------------------------------------
+# blind chees: mfcc.py
+# --------------------------------------------------------------
+
 import numpy as np
 import fourier_transform as ft
 
@@ -12,7 +16,7 @@ def melfilterbank(nfilt, nfft, samplerate):
     ml = np.linspace(mel(lower), mel(upper), num=nfilt+2)
     h = imel(ml)
     f = np.floor((nfft + 1) * h / samplerate)
-    H = np.zeros([nfilt,nfft // 2 + 1])
+    H = np.zeros([nfilt, nfft])
     for m in range(0, nfilt):
         for k in range(int(f[m]), int(f[m + 1])):
             H[m,k] = (k - f[m]) / (f[m + 1] - f[m])
@@ -20,7 +24,7 @@ def melfilterbank(nfilt, nfft, samplerate):
             H[m,k] = (f[m + 2] - k) / (f[m + 2] - f[m + 1])
     return H
 
-def coeficients(rate, audio):
+def getcoeficients(rate, audio):
     """
     Get the Mel Frecuency Cepstral Coeficients from the input audio.
 
