@@ -1,36 +1,66 @@
 import numpy as np
+import fourier_transform as ft
 
-def coeficients(r, a):
+def mel(f):
+    return 1125 * np.log(1 + f / 700)
+
+def imel(m):
+    return 700 * (np.exp(m / 1125) - 1)
+
+def melfilterbank(nfilt, nfft, samplerate):
+    lower, upper = 500, 20000
+    ml = np.linspace(mel(lower), mel(upper), num=nfilt+2)
+    h = imel(ml)
+    f = np.floor((nfft + 1) * h / samplerate)
+    H = np.zeros([nfilt,nfft // 2 + 1])
+    for m in range(0, nfilt):
+        for k in range(int(f[m]), int(f[m + 1])):
+            H[m,k] = (k - f[m]) / (f[m + 1] - f[m])
+        for k in range(int(f[m + 1]), int(f[m + 2])):
+            H[m,k] = (f[m + 2] - k) / (f[m + 2] - f[m + 1])
+    return H
+
+def coeficients(rate, audio):
     """
     Get the Mel Frecuency Cepstral Coeficients from the input audio.
 
     Arguments:
-    a -- An audio type wav.
+    rate -- Sample rate of the input audio.
+    audio -- A numpy array with the info of the audio.
 
     Return:
-    c -- A numpy array with the mfcc from the audio.
+    coefs -- A numpy array with the mfcc from the audio.
     """
 
-    fms = 0.02                                     # Frame time in mili-seconds
-    fstp = 0.01                                     # Frame step in mili-seconds
-    fsr = fms * r                                       # Sampled rate for frame
-    fstpr = fstp * r                                     # Sampled rate for step
+    frame_length = 0.02                           # Frame length in mili-seconds
+    frame_step = 0.01                               # Frame step in mili-seconds
+    nsamples_frame = int(frame_length * rate)      # Number of samples for frame
+    nsamples_step = int(frame_step * rate)          # Number of samples for step
 
-    a = np.append(a, np.zeros(fstpr - (a.shape[0] - fsr) % fstpr))  # Fill zeros
+    k = nsamples_step - (audio.shape[0] - nsamples_frame) % nsamples_step
+    audio = np.append(audio, np.zeros(k))                           # Fill zeros
 
-    stp = 0
-    while stp + fsr - 1 < a.shape[0]:                           # For each frame
-        s = a[stp : stp + fsr]                                           # Frame
+    coefs = np.array([])
+    
+    step = 0
+    while step + nsamples_frame - 1 < audio.shape[0]:           # For each frame
+        frame = audio[step : step + nsamples_frame]                      # Frame
+        k = int(2 ** np.ceil(np.log2(nsamples_frame)) - nsamples_frame)
+        frame = np.concatenate((frame, np.zeros(k)))         # Fill power of two
 
-        """ Fourier Transform """
-        S = fft(s)                                      # Fast Fourier Transform
-        P = S ** 2 / s.shape[0]                                 # Power spectral
+        """ Fast Fourier Transform """
+        s = frame * np.hamming(frame.size)          # Multiply by hamming window
+        S = ft.fft(s)                                   # Fast Fourier Transform
+        P = np.absolute(S) ** 2 / s.size                        # Power spectral
         """ Apply the mel filterbank """
-        mfb = mel_filterbank()
-        c = np.dot(mfb.T, P)
+        H = melfilterbank(26, P.size, rate)
+        a = np.dot(P, H.T)
         """ Take the log """
-        c = np.log(c)
+        b = np.log(a)
         """ Discrete Cosine Transform """
-        c = dct(c)
+        c = ft.dct(b)
+        coefs = np.append(coefs, c[:c.size // 2])
 
-        stp += fstpr                                                # Next Frame
+        step += nsamples_step                                       # Next Frame
+
+    return coefs
