@@ -12,7 +12,7 @@ def imel(m):
     return 700 * (np.exp(m / 1125) - 1)
 
 def melfilterbank(nfilt, nfft, samplerate):
-    lower, upper = 500, 20000
+    lower, upper = 300, 8000
     ml = np.linspace(mel(lower), mel(upper), num=nfilt+2)
     h = imel(ml)
     f = np.floor((nfft + 1) * h / samplerate)
@@ -36,7 +36,7 @@ def getcoeficients(rate, audio):
     coefs -- A numpy array with the mfcc from the audio.
     """
 
-    frame_length = 0.02                           # Frame length in mili-seconds
+    frame_length = 0.025                          # Frame length in mili-seconds
     frame_step = 0.01                               # Frame step in mili-seconds
     nsamples_frame = int(frame_length * rate)      # Number of samples for frame
     nsamples_step = int(frame_step * rate)          # Number of samples for step
@@ -66,5 +66,5 @@ def getcoeficients(rate, audio):
         coefs = np.append(coefs, c[:c.size // 2])
 
         step += nsamples_step                                       # Next Frame
-
+    
     return coefs
