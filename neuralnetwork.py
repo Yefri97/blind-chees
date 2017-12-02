@@ -12,7 +12,7 @@ def initialize_with_zeros(dim):
 def propagate(w, b, X, Y):
     m = Y.size
     A = sigmoid(np.dot(w.T, X) + b)
-    dw = np.dot(X, (A - Y).T) / m
+    dw = np.dot(X, (A - Y).T) / m + (0 / m) * w
     db = (A - Y).sum() / m
     return dw, db
 
