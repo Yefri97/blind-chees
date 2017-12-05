@@ -1,6 +1,7 @@
+from speech_recognition import SpeechRecognition
+import sounddevice as sd
 import numpy as np
 import scipy.io.wavfile
-from speech_recognition import SpeechRecognition
 
 def process(audio):
     signal = audio.T[0] if len(audio.shape) == 2 else audio
@@ -24,9 +25,32 @@ for i in range(m_train):
     signal = process(audio)
     X[i] = signal
 
+print("Training...")
+
 walker = SpeechRecognition(X, tags)
 
+while True:
+    print("Recording...\n")
+
+    fs = 16000
+    duration = 3
+    audio = sd.rec(int(duration * fs), samplerate=fs, channels=2)
+    sd.wait()
+
+    audio = audio[fs:2*fs]
+
+    sd.play(audio, fs)
+    sd.wait()
+    sd.stop()
+
+    print("Prediction --> ", end="")
+    print(walker.predict(process(audio)))
+
+    print("\n\n")
+
+"""
 for i in range(9):
     rate, audiorec = scipy.io.wavfile.read('audios/test' + str(i) + '.wav')
     signal = process(audiorec)
     print(walker.predict(signal))
+"""
