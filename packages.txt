@@ -8,3 +8,4 @@ http://python-sounddevice.readthedocs.io/en/0.3.9/
 setuptools
 cffi
 libportaudio2
+sounddevice
