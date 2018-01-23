@@ -5,6 +5,7 @@ class Chess():
     width = 900
     height = 600
     background = [82, 82, 82]
+    board = [-1] * 64
 
     tiles = (
         pygame.image.load('img/white.png'),
@@ -43,7 +44,7 @@ class Chess():
 
     def __init__(self):
         pygame.init()
-        self.board = pygame.display.set_mode([self.width, self.height])
+        self.screen = pygame.display.set_mode([self.width, self.height])
         self.draw_board()
 
     def get_coord(self, pos):
@@ -51,14 +52,15 @@ class Chess():
 
     def draw_board(self):
         """"""
-        self.board.fill(self.background)
+        self.screen.fill(self.background)
 
         for k in range(64):
-            self.board.blit(self.tiles[((k + 1) + (k // 8)) % 2], self.get_coord(k))
+            self.screen.blit(self.tiles[((k + 1) + (k // 8)) % 2], self.get_coord(k))
 
         for i in range(12):
             for p in self.positions[i]:
-                self.board.blit(self.pieces[i], self.get_coord(p))
+                self.screen.blit(self.pieces[i], self.get_coord(p))
+                self.board[p] = i
 
         pygame.display.flip()
 
@@ -66,23 +68,61 @@ class Chess():
         self.positions[type_piece][id_piece] = new_pos
         self.draw_board()
 
-    def moves_rey(pos):
+    def moves_rey(self, pos, color):
         pass
 
-    def moves_dama(pos):
+    def moves_dama(self, pos, color):
         pass
 
-    def moves_alfil(pos):
+    def moves_alfil(self, pos, color):
         pass
 
-    def moves_torre(pos):
+    def moves_caballo(self, pos, color):
+        dx = [-2, -1, 1, 2, 2, 1, -1, -2]
+        dy = [1, 2, 2, 1, -1, -2, -2, -1]
+        movs = []
+        x, y = pos % 8, pos // 8
+        for k in range(8):
+            nx, ny = x + dx[k], y + dy[k]
+            if nx < 0 or nx > 7 or ny < 0 or ny > 7:
+                continue
+            np = 8 * ny + nx
+            tp = self.board[np]
+            if tp == -1 or tp % 2 != color:
+                movs.append(np)
+        return movs
+
+    def moves_torre(self, pos, color):
         pass
 
-    def moves_caballo(pos):
-        pass
+    def moves_peon(self, pos, color):
+        dx = [-1, 1, 0, 0]
+        dy = [1, 1, 1, 2]
+        x, y = pos % 8, pos // 8
+        movs = []
+        for k in range(4):
+            nx, ny = x + dx[k], y + (dy[k] if color == 0 else -dy[k])
+            if nx < 0 or nx > 7 or ny < 0 or ny > 7:
+                continue
+            np = 8 * ny + nx
+            tp = self.board[np]
+            if tp == -1:
+                if k == 2:
+                    movs.append(np)
+                if k == 3 and (y == 1 and color == 0 or y == 6 and color == 1):
+                    movs.append(np)
+            else:
+                if tp % 2 != color and k < 2:
+                    movs.append(np)
+                if k == 2:
+                    break;
+        return movs
 
-    def moves_peon(pos):
-        pass
-
-    def show_moves(id_piece):
-        pass
+    def get_moves(self, type_piece):
+        tags = ['rey', 'dama', 'alfil', 'caballo', 'torre', 'peon']
+        method = 'moves_' + tags[type_piece // 2]
+        visitor = getattr(self, method)
+        all_movs = []
+        for pos in self.positions[type_piece]:
+            all_movs.append(visitor(pos, type_piece % 2))
+        return all_movs
