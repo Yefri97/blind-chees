@@ -69,13 +69,61 @@ class Chess():
         self.draw_board()
 
     def moves_rey(self, pos, color):
-        pass
+        dx = [-1, -1, 0, 1, 1, 1, 0, -1];
+        dy = [0, -1, -1, -1, 0, 1, 1, 1];
+        movs = []
+        x, y = pos % 8, pos // 8
+        for k in range(8):
+            nx, ny = x + dx[k], y + dy[k]
+            if nx < 0 or nx > 7 or ny < 0 or ny > 7:
+                continue
+            np = 8 * ny + nx
+            tp = self.board[np]
+            if tp == -1 or tp % 2 != color:
+                movs.append(np)
+        return movs
 
     def moves_dama(self, pos, color):
-        pass
+        dx = [-1, 1, -1, 1, -1, 0, 1, 0]
+        dy = [-1, -1, 1, 1, 0, -1, 0, 1]
+        movs = []
+        x, y = pos % 8, pos // 8
+        for k in range(8):
+            j = 1
+            while True:
+                nx, ny = x + j * dx[k], y + j * dy[k]
+                if nx < 0 or nx > 7 or ny < 0 or ny > 7:
+                    break
+                np = 8 * ny + nx
+                tp = self.board[np]
+                if tp != -1:
+                    if tp % 2 != color:
+                        movs.append(np)
+                    break
+                movs.append(np)
+                j += 1
+        return movs
 
     def moves_alfil(self, pos, color):
-        pass
+        dx = [-1, 1, -1, 1]
+        dy = [-1, -1, 1, 1]
+        movs = []
+        x, y = pos % 8, pos // 8
+        for k in range(4):
+            j = 1
+            while True:
+                nx, ny = x + j * dx[k], y + j * dy[k]
+                if nx < 0 or nx > 7 or ny < 0 or ny > 7:
+                    break
+                np = 8 * ny + nx
+                tp = self.board[np]
+                if tp != -1:
+                    if tp % 2 != color:
+                        movs.append(np)
+                    break
+                movs.append(np)
+                j += 1
+        return movs
 
     def moves_caballo(self, pos, color):
         dx = [-2, -1, 1, 2, 2, 1, -1, -2]
@@ -93,7 +141,25 @@ class Chess():
         return movs
 
     def moves_torre(self, pos, color):
-        pass
+        dx = [-1, 0, 1, 0]
+        dy = [0, -1, 0, 1]
+        movs = []
+        x, y = pos % 8, pos // 8
+        for k in range(4):
+            j = 1
+            while True:
+                nx, ny = x + j * dx[k], y + j * dy[k]
+                if nx < 0 or nx > 7 or ny < 0 or ny > 7:
+                    break
+                np = 8 * ny + nx
+                tp = self.board[np]
+                if tp != -1:
+                    if tp % 2 != color:
+                        movs.append(np)
+                    break
+                movs.append(np)
+                j += 1
+        return movs
 
     def moves_peon(self, pos, color):
         dx = [-1, 1, 0, 0]
