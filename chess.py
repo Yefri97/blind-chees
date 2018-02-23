@@ -65,7 +65,13 @@ class Chess():
         pygame.display.flip()
 
     def move_piece(self, type_piece, id_piece, new_pos):
+        self.board[self.positions[type_piece][id_piece]] = -1
         self.positions[type_piece][id_piece] = new_pos
+        eaten = self.board[new_pos]
+        if eaten != -1:
+            idp = self.positions[eaten].index(new_pos)
+            self.positions[eaten][idp] = -1
+        self.board[new_pos] = type_piece
         self.draw_board()
 
     def moves_rey(self, pos, color):
@@ -188,7 +194,18 @@ class Chess():
         tags = ['rey', 'dama', 'alfil', 'caballo', 'torre', 'peon']
         method = 'moves_' + tags[type_piece // 2]
         visitor = getattr(self, method)
-        all_movs = []
-        for pos in self.positions[type_piece]:
-            all_movs.append(visitor(pos, type_piece % 2))
-        return all_movs
+        res = []
+        for (id_piece, pos) in enumerate(self.positions[type_piece]):
+            if pos != -1:
+                movs = visitor(pos, type_piece % 2)
+                for np in movs:
+                    row, col = np // 8, np % 8
+                    move = (type_piece, id_piece, row, col)
+                    res.append(move)
+        return res
+
+    def get_all_valid_moves(self, color):
+        valid_moves = []
+        for piece in range(6):
+            valid_moves += self.get_moves(2 * piece + color)
+        return valid_moves

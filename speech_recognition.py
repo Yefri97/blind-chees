@@ -60,8 +60,7 @@ class Receptor():
         coefs = coefs / 20
 
         p = neuralnetwork.sigmoid(np.dot(self.W, coefs.T) + self.B)
-        val = np.argmax(p)
-        return val
+        return p.T
 
 class SpeechRecognition():
 
@@ -77,30 +76,46 @@ class SpeechRecognition():
         print("3...")
         self.rec_row = Receptor(self.tags_row)
 
-    def listen(self):
+    def listen(self, valid_moves):
         """
         """
         fs = 16000
-        duration = 4
+        duration = 3
+        dfs = int(duration * fs)
 
         while True:
             print("Press enter to record...")
             input()
 
-            audio = sd.rec(int(duration * fs), samplerate=fs, channels=2)
+            audio = sd.rec(dfs, samplerate=fs, channels=2)
             sd.wait()
 
-            signal = audio.T[0]
+            input_signal = audio.T[0]
+            signal0 = input_signal[0:dfs//3]
+            signal1 = input_signal[dfs//3:2*dfs//3]
+            signal2 = input_signal[2*dfs//3:dfs]
 
-            piece = self.rec_piece.predict(signal[fs:2*fs])
-            col = self.rec_col.predict(signal[2*fs:3*fs])
-            row = self.rec_row.predict(signal[3*fs:4*fs])
+            # sd.play(audio, fs)
+            # sd.wait()
 
-            a = self.tags_pieces[piece]
-            b = self.tags_col[col]
-            c = self.tags_row[row]
+            pred_piece = self.rec_piece.predict(signal0)
+            pred_col = self.rec_col.predict(signal1)
+            pred_row = self.rec_row.predict(signal2)
+
+            max_val, res = 0, -1
+            for (id_move, move) in enumerate(valid_moves):
+                tp, idp, r, c = move
+                val = pred_piece[tp // 2] * pred_row[r] * pred_col[c]
+                if val > max_val:
+                    max_val = val
+                    res = id_move
+
+            a = self.tags_pieces[valid_moves[res][0] // 2]
+            b = self.tags_col[valid_moves[res][3]]
+            c = self.tags_row[valid_moves[res][2]]
 
             print("You say " + a + " " + b + " " + c + "... Is correct? y / n")
             if input() == "y":
                 break
-        return (piece, col, row)
+
+        return valid_moves[res]
