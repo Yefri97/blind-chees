@@ -25,6 +25,6 @@ for i in range(5):
         signal1 = audio[2*fs:3*fs]
         signal2 = audio[3*fs:4*fs]
 
-        scipy.io.wavfile.write("audios/persona" + str(i) + "/" + tags0[perm0[k]] + ".wav", fs, signal0)
-        scipy.io.wavfile.write("audios/persona" + str(i) + "/" + tags1[perm1[k]] + ".wav", fs, signal1)
-        scipy.io.wavfile.write("audios/persona" + str(i) + "/" + tags2[perm2[k]] + ".wav", fs, signal2)
+        scipy.io.wavfile.write("audios/set" + str(i) + "/" + tags0[perm0[k]] + ".wav", fs, signal0)
+        scipy.io.wavfile.write("audios/set" + str(i) + "/" + tags1[perm1[k]] + ".wav", fs, signal1)
+        scipy.io.wavfile.write("audios/set" + str(i) + "/" + tags2[perm2[k]] + ".wav", fs, signal2)

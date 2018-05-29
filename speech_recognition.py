@@ -15,7 +15,7 @@ class Receptor():
 
     def __init__(self, tags):
         self.tags = tags
-        self.m = 10
+        self.m = 5
         self.k_tags = len(tags)
         self.m_train = self.k_tags * self.m
 

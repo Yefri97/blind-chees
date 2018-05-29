@@ -2,7 +2,6 @@ from speech_recognition import SpeechRecognition
 from chess import Chess
 from game import Game
 from minimax import Minimax
-import time
 
 WHITE = 0
 BLACK = 1
@@ -40,4 +39,3 @@ if __name__ == '__main__':
         print("End..? y / n")
         if input() == "y":
             break
-        

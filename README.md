@@ -13,3 +13,6 @@ Is a form of chess play wherein the players do not see the positions of the piec
 - libportaudio2
 
 - pygame
+
+## Notes
+- You can use generate_audios.py to generate the training set easier
