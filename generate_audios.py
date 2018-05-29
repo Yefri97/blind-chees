@@ -14,7 +14,7 @@ fs = 16000
 duration = 4
 
 for i in range(5):
-    print("Persona" + str(i) + ":")
+    print("Set " + str(i) + ":")
     for k in range(8):
         print("Say " + tags0[perm0[k]] + " " + tags1[perm1[k]] + " " + tags2[perm2[k]] + ":")
         input()

@@ -23,7 +23,7 @@ class Receptor():
 
         for i in range(self.m_train):          # Load the audios of the data set
             word = self.tags[i // self.m]
-            filename = 'audios/persona' + str(i % self.m) + '/' + word + '.wav'
+            filename = 'audios/set' + str(i % self.m) + '/' + word + '.wav'
             rate, audio = scipy.io.wavfile.read(filename)
             signal = audio.T[0]
             X[i] = signal
@@ -76,6 +76,12 @@ class SpeechRecognition():
         print("3...")
         self.rec_row = Receptor(self.tags_row)
 
+    def say(self, move):
+        a = self.tags_pieces[move[0] // 2]
+        b = self.tags_col[move[3]]
+        c = self.tags_row[move[2]]
+        return a + " " + b + " " + c
+
     def listen(self, valid_moves):
         """
         """
@@ -103,18 +109,14 @@ class SpeechRecognition():
             for (id_move, move) in enumerate(valid_moves):
                 tp, idp, r, c = move
                 val = pred_piece[tp // 2] * pred_row[r] * pred_col[c]
-                # print(self.tags_pieces[tp // 2] + " " + self.tags_col[c] + " " + self.tags_row[r])
-                # print(str(pred_piece[tp // 2]) + " " + str(pred_col[c]) + " " + str(pred_row[r]) + " " + str(val))
+                # print(self.say(move), "%.6f" % val)
+                # print("%.6f" % pred_piece[tp//2], "%.6f" % pred_col[c], "%.6f" % pred_row[r], '\n')
                 if val > max_val:
                     max_val = val
                     res = id_move
 
-            a = self.tags_pieces[valid_moves[res][0] // 2]
-            b = self.tags_col[valid_moves[res][3]]
-            c = self.tags_row[valid_moves[res][2]]
-
-            print("Probability: " + str(max_val))
-            print("You say " + a + " " + b + " " + c + "... Is correct? y / n")
+            print("Probability: %.6f" % max_val)
+            print("You say " + self.say(valid_moves[res]) + "... Is correct? y / n")
             if input() == "y":
                 break
 
