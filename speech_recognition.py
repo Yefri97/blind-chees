@@ -15,7 +15,7 @@ class Receptor():
 
     def __init__(self, tags):
         self.tags = tags
-        self.m = 5
+        self.m = 10
         self.k_tags = len(tags)
         self.m_train = self.k_tags * self.m
 
@@ -80,7 +80,7 @@ class SpeechRecognition():
         """
         """
         fs = 16000
-        duration = 3
+        duration = 4
         dfs = int(duration * fs)
 
         while True:
@@ -91,21 +91,20 @@ class SpeechRecognition():
             sd.wait()
 
             input_signal = audio.T[0]
-            signal0 = input_signal[0:dfs//3]
-            signal1 = input_signal[dfs//3:2*dfs//3]
-            signal2 = input_signal[2*dfs//3:dfs]
-
-            # sd.play(audio, fs)
-            # sd.wait()
+            signal0 = input_signal[fs:2*fs]
+            signal1 = input_signal[2*fs:3*fs]
+            signal2 = input_signal[3*fs:4*fs]
 
             pred_piece = self.rec_piece.predict(signal0)
             pred_col = self.rec_col.predict(signal1)
             pred_row = self.rec_row.predict(signal2)
 
-            max_val, res = 0, -1
+            max_val, res = -1, -1
             for (id_move, move) in enumerate(valid_moves):
                 tp, idp, r, c = move
                 val = pred_piece[tp // 2] * pred_row[r] * pred_col[c]
+                # print(self.tags_pieces[tp // 2] + " " + self.tags_col[c] + " " + self.tags_row[r])
+                # print(str(pred_piece[tp // 2]) + " " + str(pred_col[c]) + " " + str(pred_row[r]) + " " + str(val))
                 if val > max_val:
                     max_val = val
                     res = id_move
@@ -114,6 +113,7 @@ class SpeechRecognition():
             b = self.tags_col[valid_moves[res][3]]
             c = self.tags_row[valid_moves[res][2]]
 
+            print("Probability: " + str(max_val))
             print("You say " + a + " " + b + " " + c + "... Is correct? y / n")
             if input() == "y":
                 break

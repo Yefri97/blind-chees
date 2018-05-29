@@ -1,33 +1,43 @@
 from speech_recognition import SpeechRecognition
 from chess import Chess
+from game import Game
+from minimax import Minimax
+import time
+
+WHITE = 0
+BLACK = 1
 
 if __name__ == '__main__':
 
     print("Creating the speech recognition...")
-    walker = SpeechRecognition()
+    rec = SpeechRecognition()
     print("Speech Recognition created...\n")
 
     print("Creating the board game...")
-    game = Chess()
+    board = Chess()
+    game = Game()
+    game.draw(board)
     print("Board Game created...\n")
 
-    turn = 0
+    rival = Minimax(BLACK)
+
     while True:
-
-        print("Play " + ("white" if turn == 0 else "black") + " pieces\n")
-
-        valid_moves = game.get_all_valid_moves(turn)
-
-        chosen_move = walker.listen(valid_moves)
-
-        type_piece = chosen_move[0]
-        id_piece = chosen_move[1]
-        new_pos = 8 * chosen_move[2] + chosen_move[3]
-
-        game.move_piece(type_piece, id_piece, new_pos)
+        # Get all the valid moves for the white player
+        valid_moves = board.get_all_valid_moves(WHITE)
+        # The movement is chosen
+        chosen_move = rec.listen(valid_moves)
+        # Do the movement in the board
+        board.do(chosen_move)
+        # Print the game
+        game.draw(board)
+        # Get the best move for the black player
+        rival_move = rival.get_best_move(board)
+        # Do the rival movement
+        board.do(rival_move)
+        # Print the game
+        game.draw(board)
 
         print("End..? y / n")
         if input() == "y":
             break
-
-        turn = 1 - turn
+        

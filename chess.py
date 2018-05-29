@@ -1,70 +1,43 @@
-import pygame
+# ------------------------------------------------------------------------------
+#
+# Chess: chess.py
+#
+# ------------------------------------------------------------------------------
+
+# Initial positions of the chess board
+initial = [
+    [4],                                    # Rey blanco
+    [60],                                   # Rey negro
+    [3],                                    # Reina blanco
+    [59],                                   # Reina negro
+    [2, 5],                                 # Alfiles blancos
+    [58, 61],                               # Alfiles negros
+    [1, 6],                                 # Caballos blancos
+    [57, 62],                               # Caballos negros
+    [0, 7],                                 # Torres blancas
+    [56, 63],                               # Torres negras
+    [8, 9, 10, 11, 12, 13, 14, 15],         # Peones blancos
+    [48, 49, 50, 51, 52, 53, 54, 55]        # Peones negros
+]
 
 class Chess():
 
-    width = 900
-    height = 600
-    background = [82, 82, 82]
-    board = [-1] * 64
+    def __init__(self, positions=initial):
 
-    tiles = (
-        pygame.image.load('img/white.png'),
-        pygame.image.load('img/gray.png')
-    )
+        self.board = [-1] * 64
+        self.positions = []
 
-    pieces = [
-        pygame.image.load('img/whiteKing.png'),
-        pygame.image.load('img/blackKing.png'),
-        pygame.image.load('img/whiteQueen.png'),
-        pygame.image.load('img/blackQueen.png'),
-        pygame.image.load('img/whiteBishop.png'),
-        pygame.image.load('img/blackBishop.png'),
-        pygame.image.load('img/whiteKnight.png'),
-        pygame.image.load('img/blackKnight.png'),
-        pygame.image.load('img/whiteRook.png'),
-        pygame.image.load('img/blackRook.png'),
-        pygame.image.load('img/whitePawn.png'),
-        pygame.image.load('img/blackPawn.png')
-    ]
+        for i in range(len(positions)):
+            self.positions.append([])
+            for p in positions[i]:
+                if p != -1:
+                    self.board[p] = i
+                self.positions[i].append(p)
 
-    positions = [
-        [4],                                                  # Rey blanco
-        [60],                                                 # Rey negro
-        [3],                                                  # Reina blanco
-        [59],                                                 # Reina negro
-        [2, 5],                                               # Alfiles blancos
-        [58, 61],                                             # Alfiles negros
-        [1, 6],                                               # Caballos blancos
-        [57, 62],                                             # Caballos negros
-        [0, 7],                                               # Torres blancas
-        [56, 63],                                             # Torres negras
-        [8, 9, 10, 11, 12, 13, 14, 15],                       # Peones blancos
-        [48, 49, 50, 51, 52, 53, 54, 55]                      # Peones negros
-    ]
-
-    def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode([self.width, self.height])
-        self.draw_board()
-
-    def get_coord(self, pos):
-        return (250 + (pos % 8) * 50, 450 - (pos // 8) * 50)
-
-    def draw_board(self):
-        """"""
-        self.screen.fill(self.background)
-
-        for k in range(64):
-            self.screen.blit(self.tiles[((k + 1) + (k // 8)) % 2], self.get_coord(k))
-
-        for i in range(12):
-            for p in self.positions[i]:
-                self.screen.blit(self.pieces[i], self.get_coord(p))
-                self.board[p] = i
-
-        pygame.display.flip()
-
-    def move_piece(self, type_piece, id_piece, new_pos):
+    def do(self, movement):
+        type_piece = movement[0]
+        id_piece = movement[1]
+        new_pos = 8 * movement[2] + movement[3]
         self.board[self.positions[type_piece][id_piece]] = -1
         self.positions[type_piece][id_piece] = new_pos
         eaten = self.board[new_pos]
@@ -72,7 +45,11 @@ class Chess():
             idp = self.positions[eaten].index(new_pos)
             self.positions[eaten][idp] = -1
         self.board[new_pos] = type_piece
-        self.draw_board()
+
+    def simulate(self, movement):
+        other = Chess(self.positions)
+        other.do(movement)
+        return other
 
     def moves_rey(self, pos, color):
         dx = [-1, -1, 0, 1, 1, 1, 0, -1];
