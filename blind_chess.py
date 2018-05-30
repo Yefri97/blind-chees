@@ -55,6 +55,7 @@ if __name__ == '__main__':
         # Do the rival movement
         board.do(rival_move)
 
+        # Text to Speech
         movement = rec.say(rival_move)
 
         tts = gTTS(text=movement, lang='es')
