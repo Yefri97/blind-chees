@@ -48,4 +48,18 @@ class Game():
             if board.board[i] != -1:
                 self.screen.blit(self.pieces[board.board[i]], self.coord(i))
 
+        x_a = 265
+        y_n = 455        
+        font = pygame.font.SysFont("arial", 30)
+        pos_abc = ["a", "b", "c", "d", "e", "f", "g", "h"]
+        pos_num = ["1", "2", "3", "4", "5", "6", "7", "8"]
+
+        for i in range(8):
+            leter = font.render(pos_abc[i], True, (0, 0, 0))
+            num = font.render(pos_num[i], True, (0, 0, 0))
+            self.screen.blit(leter, (x_a, 505))
+            self.screen.blit(num, (220, y_n))
+            x_a = x_a + 50
+            y_n = y_n - 50
+
         pygame.display.flip()
