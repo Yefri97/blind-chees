@@ -14,5 +14,9 @@ Is a form of chess play wherein the players do not see the positions of the piec
 
 - pygame
 
+- gTTS
+
+- sudo apt-get install mpg321
+
 ## Notes
 - You can use generate_audios.py to generate the training set easier
